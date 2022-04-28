@@ -25,7 +25,7 @@ namespace TextFilesProcessing
            string[] winners = FinalResultsAnalyser.GetWinners(countries, arrayOfCountriesPoints);
            Console.WriteLine("Winners:");
            ConsoleWriter.PrintArray(winners);
-           ResultWriter.WriteToFile(winners);
+           ResultWriter.WriteToFile(winners, filepath);
         }
 
     }
