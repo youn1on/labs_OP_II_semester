@@ -7,13 +7,13 @@ namespace TextFilesProcessing
 {
     public class MatrixCreator
     {
-        public static KeyValuePair<string[], int[,]> CreateMatrix(string path)
+        public static KeyValuePair<string[], int[,]> GetCountriesMatrix(string path)
         {
             
             string[] files = Directory.GetFiles(path, "*.csv");
             if (files.Length == 0)
             {
-                return new (null,null);
+                throw new NoFilesException("No .csv files found");
             }
             Regex regex = new Regex(@"^[\w ]+,(?:\d+,)+\d+$");
             StreamReader sr;
@@ -32,7 +32,7 @@ namespace TextFilesProcessing
                 nextLine = "";
             }
 
-            if (nextLine == "") return new(null, null);
+            if (nextLine == "") throw new AllInvalidFilesException("All found files are invalid to build a matrix.");
             int participantCountriesNumber = nextLine.Split(",").Length-1;
             int i = 0;
             string[] countries = new string[participantCountriesNumber];
@@ -50,10 +50,7 @@ namespace TextFilesProcessing
                     countries[i] = row[0];
                     for (int j = 1; j < row.Length; j++)
                     {
-                        if (!Int32.TryParse(row[j], out matrix[i,j-1]))
-                        {
-                            return new (null,null);
-                        }
+                        matrix[i, j - 1] = Int32.Parse(row[j]);
                     }
 
                     i++;

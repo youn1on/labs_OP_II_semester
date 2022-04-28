@@ -6,16 +6,26 @@ namespace TextFilesProcessing
     class Program
     {
         static void Main(string[] args)
-        {
+        {   
             string filepath = FilepathOperations.GetPath();
-           (string[] countries, int[,] matrix) = MatrixCreator.CreateMatrix(filepath);
-           if (countries is null || matrix is null)
-           {
-               Console.WriteLine("Incorrect data");
-               Environment.Exit(1);
-           }
-           Console.WriteLine("Initial matrix:");
-           ConsoleWriter.PrintMatrix(matrix);
+            string[] countries;
+            int[,] matrix;
+            try
+            {
+                (countries, matrix) = MatrixCreator.GetCountriesMatrix(filepath);
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("No files found");
+                return;
+            }
+            catch (AllInvalidFilesException)
+            {
+                Console.WriteLine("All files are invalid");
+                return;
+            }
+            Console.WriteLine("Initial matrix:");
+            ConsoleWriter.PrintMatrix(matrix);
            int[,] ratingMatrix = MatrixAnalyser.GetRatingMatrix(matrix);
            Console.WriteLine("Rating matrix:");
            ConsoleWriter.PrintMatrix(ratingMatrix);
