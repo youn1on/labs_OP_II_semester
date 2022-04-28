@@ -6,8 +6,9 @@ namespace TextFilesProcessing
     class Program
     {
         static void Main(string[] args)
-        { 
-           (string[] countries, int[,] matrix) = MatrixCreator.CreateMatrix();
+        {
+            string filepath = FilepathOperations.GetPath();
+           (string[] countries, int[,] matrix) = MatrixCreator.CreateMatrix(filepath);
            if (countries is null || matrix is null)
            {
                Console.WriteLine("Incorrect data");
@@ -27,6 +28,5 @@ namespace TextFilesProcessing
            ResultWriter.WriteToFile(winners);
         }
 
-        
     }
 }

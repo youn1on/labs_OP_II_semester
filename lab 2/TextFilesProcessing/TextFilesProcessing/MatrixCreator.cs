@@ -7,7 +7,7 @@ namespace TextFilesProcessing
 {
     public class MatrixCreator
     {
-        public static KeyValuePair<string[], int[,]> CreateMatrix(string path = "C:\\Users\\Uni\\Desktop\\labs 2 semestr\\OP\\lab 2")
+        public static KeyValuePair<string[], int[,]> CreateMatrix(string path)
         {
             
             string[] files = Directory.GetFiles(path, "*.csv");
