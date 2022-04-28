@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace TextFilesProcessing
 {
@@ -14,15 +15,24 @@ namespace TextFilesProcessing
             {
                 return new (null,null);
             }
-            StreamReader sr = new StreamReader(files[0]);
-            sr.ReadLine();
-            string nextLine = sr.ReadLine();
-            sr.Close();
-            if (nextLine == null)
+            Regex regex = new Regex(@"^[\w ]+,(?:\d+,)+\d+$");
+            StreamReader sr;
+            string nextLine = "";
+            foreach (string file in files)
             {
-                return new (null,null);
+                sr = new StreamReader(file);
+                sr.ReadLine();
+                nextLine = sr.ReadLine();
+                sr.Close();
+                if (nextLine is not null && regex.IsMatch(nextLine))
+                {
+                    break;
+                }
+
+                nextLine = "";
             }
-            
+
+            if (nextLine == "") return new(null, null);
             int participantCountriesNumber = nextLine.Split(",").Length-1;
             int i = 0;
             string[] countries = new string[participantCountriesNumber];
@@ -34,8 +44,9 @@ namespace TextFilesProcessing
                 sr.ReadLine();
                 while (!sr.EndOfStream && i < participantCountriesNumber)
                 {
-                    row = sr.ReadLine()?.Split(",");
-                    if (row is null) continue;
+                    string line = sr.ReadLine();
+                    if (line is null || !regex.IsMatch(line)) continue;
+                    row = line.Split(",");
                     countries[i] = row[0];
                     for (int j = 1; j < row.Length; j++)
                     {
@@ -54,20 +65,4 @@ namespace TextFilesProcessing
             return new(countries, matrix);
         }
     }
-    
-    /* List<StreamReader> readers = new List<StreamReader>();
-             int countryCounter = 0;
-             foreach (string file in files)
-             {
-                 StreamReader sr = new StreamReader(file);
-                 if (Int32.TryParse(sr.ReadLine(), out int firstLine))
-                 {
-                     countryCounter += firstLine;
-                     readers.Add(sr);
-                 }
-                 else
-                 {
-                     sr.Close();
-                 }
-             } */
 }
