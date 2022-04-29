@@ -14,28 +14,28 @@ namespace TextFilesProcessing
             {
                 (countries, matrix) = MatrixCreator.GetCountriesMatrix(filepath);
             }
-            catch (FileNotFoundException)
+            catch (FileNotFoundException noFile)
             {
-                Console.WriteLine("No files found");
+                Console.WriteLine(noFile.Message);
                 return;
             }
-            catch (AllInvalidFilesException)
+            catch (AllInvalidFilesException noValidFiles)
             {
-                Console.WriteLine("All files are invalid");
+                Console.WriteLine(noValidFiles.Message);
                 return;
             }
             Console.WriteLine("Initial matrix:");
             ConsoleWriter.PrintMatrix(matrix);
-           int[,] ratingMatrix = MatrixAnalyser.GetRatingMatrix(matrix);
-           Console.WriteLine("Rating matrix:");
-           ConsoleWriter.PrintMatrix(ratingMatrix);
-           int[] arrayOfCountriesPoints = MatrixAnalyser.GetArrayOfCountriesPoints(ratingMatrix);
-           Console.WriteLine("Countries points:");
-           ConsoleWriter.PrintArray(arrayOfCountriesPoints);
-           string[] winners = FinalResultsAnalyser.GetWinners(countries, arrayOfCountriesPoints);
-           Console.WriteLine("Winners:");
-           ConsoleWriter.PrintArray(winners);
-           ResultWriter.WriteToFile(winners, filepath);
+            int[,] ratingMatrix = MatrixAnalyser.GetRatingMatrix(matrix);
+            Console.WriteLine("Rating matrix:");
+            ConsoleWriter.PrintMatrix(ratingMatrix);
+            int[] arrayOfCountriesPoints = MatrixAnalyser.GetArrayOfCountriesPoints(ratingMatrix);
+            Console.WriteLine("Countries points:");
+            ConsoleWriter.PrintArray(arrayOfCountriesPoints);
+            string[] winners = FinalResultsAnalyser.GetWinners(countries, arrayOfCountriesPoints);
+            Console.WriteLine("Winners:");
+            ConsoleWriter.PrintArray(winners);
+            ResultWriter.WriteToFile(winners, filepath);
         }
 
     }
