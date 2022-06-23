@@ -9,7 +9,12 @@ namespace ImageResizer
         {
             if (args.Length != 3 || !FilePathValidator.Validate(args[0]) ||
                 !FilePathValidator.FileDirectoryExists(args[1]) ||
-                ! double.TryParse(args[2].Replace(',', '.'), out double multiplier)) return;
+                !double.TryParse(args[2].Replace(',', '.'), out double multiplier))
+            {
+                Console.WriteLine("Invalid input!"); 
+                return;
+            }
+                
             byte[] content = FileInput.GetContent(args[0]);
             bool isValidFile = FileValidator.ValidateFile(content);
             bool isCorrectMultiplier = double.Parse(args[2]) > 0;
