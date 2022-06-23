@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace ImageResizer
 {
@@ -8,16 +9,20 @@ namespace ImageResizer
         {
             if (args.Length != 3 || !FilePathValidator.Validate(args[0]) ||
                 !FilePathValidator.FileDirectoryExists(args[1]) ||
-                ! double.TryParse(args[2], out double multiplier)) return;
-            Console.WriteLine($"Enlarging image {multiplier} times... Done.");
+                ! double.TryParse(args[2].Replace(',', '.'), out double multiplier)) return;
             byte[] content = FileInput.GetContent(args[0]);
-            if (FileValidator.ValidateFile(content))
+            bool isValidFile = FileValidator.ValidateFile(content);
+            bool isCorrectMultiplier = double.Parse(args[2]) > 0;
+            if (!isValidFile) Console.WriteLine("Invalid file structure");
+            else if (!isCorrectMultiplier) Console.WriteLine("Multiplier is < 0");
+            else 
             {
+                Console.Write($"Enlarging image {multiplier} times... ");
                 Picture picture = new Picture(content);
                 picture.Resize(multiplier);
                 FileOutput.ImageToFile(picture, args[1]);
+                Console.WriteLine("Done.");
             }
-            else Console.WriteLine("Incorrect file structure");
         }
     }
 }
