@@ -1,14 +1,21 @@
 ﻿using System;
+using System.Linq;
 
 namespace RTreeProcessing
 {
     public class RTree
     {
         private bool IsParent = false;
-        private int Size = 0;
+        public int Size { get; private set; }
+        
         private int _maxSize = 10;
-        private double xMax, xMin, yMax, yMin;
+        public double xMax  { get; private set; }
+        public double xMin { get; private set; }
+        public double yMax { get; private set; }
+        public double yMin { get; private set; }
+        
         public GeographicalPoint[] Points;
+        
         private RTree Child1, Child2;
 
         public void Add(GeographicalPoint geographicalPoint)
@@ -26,7 +33,7 @@ namespace RTreeProcessing
                 xMax = Math.Max(geographicalPoint.Latitude, xMax);
                 yMax = Math.Max(geographicalPoint.Longitude, yMax);
                 xMin = Math.Min(geographicalPoint.Latitude, xMin);
-                xMax = Math.Min(geographicalPoint.Latitude, xMax);
+                yMin = Math.Min(geographicalPoint.Longitude, yMin);
                 if (IsParent)
                 {
                     if (IsMoreOptimalToIncludeInFirstChild(Child1, Child2, geographicalPoint)) Child1.Add(geographicalPoint);
@@ -94,15 +101,33 @@ namespace RTreeProcessing
 
         private bool HasIntersectionWithArea((double, double) point, int radius)
         {
-            return true;
+            if (xMax > point.Item1 && point.Item1 > xMin && yMax > point.Item2 && point.Item2 > yMin) return true;
+            double nearestVerticalEdge = Math.Abs(xMax - point.Item1) < Math.Abs(xMin - point.Item1) ? xMax : xMin;
+            double nearestHorizontalEdge = Math.Abs(yMax - point.Item2) < Math.Abs(yMin - point.Item2) ? yMax : yMin;
+            if (Math.Abs(nearestVerticalEdge - point.Item1) < Math.Abs(nearestHorizontalEdge - point.Item2))
+            {
+                return new GeographicalPoint(nearestVerticalEdge, point.Item2, "", "", "",
+                    "") - point <= radius && (point.Item1 < xMax && point.Item1 > xMin || 
+                    new GeographicalPoint(nearestVerticalEdge, nearestHorizontalEdge, "", "",
+                        "", "") - point <= radius);
+            }
+            return new GeographicalPoint(point.Item1, nearestHorizontalEdge, "", "", "",
+              "") - point <= radius && (point.Item2 < yMax && point.Item2 > yMin ||
+              new GeographicalPoint(nearestVerticalEdge, nearestHorizontalEdge, "",
+              "", "", "") - point <= radius);
+
         }
         
         public GeographicalPoint[] FindNearest(double targetX, double targetY, int radius)
         {
-            /*if (!HasIntersectionWithArea((targetX, targetY), radius)) */return Array.Empty<GeographicalPoint>();
+            if (!HasIntersectionWithArea((targetX, targetY), radius)) return Array.Empty<GeographicalPoint>();
+            if (IsParent)
+            {
+                return Child1.FindNearest(targetX, targetY, radius)
+                    .Concat(Child2.FindNearest(targetX, targetY, radius)).ToArray();
+            }
             
+            return Points.Where(p1 => p1 - (targetX, targetY) <= radius).ToArray();
         }
-
-        
     }
 }
